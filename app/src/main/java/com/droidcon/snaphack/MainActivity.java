@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.droidcon.snaphack.fragment.LoginFragment;
 import com.droidcon.snaphack.fragment.PhotoListFragment;
@@ -15,6 +17,10 @@ import com.facebook.crypto.exception.CryptoInitializationException;
 import com.facebook.crypto.exception.KeyChainException;
 
 import java.io.IOException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableEntryException;
+import java.security.cert.CertificateException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -38,7 +44,34 @@ public class MainActivity extends AppCompatActivity {
 
             String fileName = System.currentTimeMillis() + "_photo";
 
-            CryptoManager externalFileManager = new CryptoManager(this, ShApplication.getInstance().getConfiguredStorageDirectory(), new KeyManager(this).read());
+            CryptoManager externalFileManager = null;
+            try {
+                externalFileManager = new CryptoManager(this, ShApplication.getInstance().getConfiguredStorageDirectory(), new KeyManager(this).read());
+            } catch (KeyStoreException e) {
+                Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+                Log.e("Tomek", e.getMessage());
+                e.printStackTrace();
+            } catch (CertificateException e) {
+                Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+                Log.e("Tomek", e.getMessage());
+                e.printStackTrace();
+            } catch (NoSuchAlgorithmException e) {
+                Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+                Log.e("Tomek", e.getMessage());
+                e.printStackTrace();
+            } catch (IOException e) {
+                Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+                Log.e("Tomek", e.getMessage());
+                e.printStackTrace();
+            } catch (UnrecoverableEntryException e) {
+                Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+                Log.e("Tomek", e.getMessage());
+                e.printStackTrace();
+            }
+
+
+
+
             try {
                 if (requestCode == REQUEST_IMAGE_CAPTURE) {
                     externalFileManager.savePhoto(imageBitmap, fileName + ".jpg");

@@ -1,9 +1,14 @@
 package com.droidcon.snaphack.service;
 
 import android.content.Context;
+import android.support.design.widget.Snackbar;
 import android.util.Log;
 
 import com.droidcon.snaphack.manager.KeyManager;
+
+import java.security.InvalidAlgorithmParameterException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 
 import retrofit.Callback;
 import retrofit.RestAdapter;
@@ -27,8 +32,17 @@ public class ServiceManager {
         restService.login(new LoginRequest(username, password), new Callback<LoginResponse>() {
             @Override
             public void success(LoginResponse loginResponse, Response response) {
-                new KeyManager(context).save(loginResponse.getKey());
-                callback.success(loginResponse, response);
+                try{
+                    new KeyManager(context).save(loginResponse.getKey());
+                    callback.success(loginResponse, response);
+
+                } catch (NoSuchProviderException e) {
+                    e.printStackTrace();
+                } catch (NoSuchAlgorithmException e) {
+                    e.printStackTrace();
+                } catch (InvalidAlgorithmParameterException e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override

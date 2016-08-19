@@ -14,6 +14,10 @@ import com.facebook.crypto.exception.KeyChainException;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableEntryException;
+import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,7 +47,20 @@ public class FileManager {
             return photos;
         }
 
-        CryptoManager manager = new CryptoManager(context, ShApplication.getInstance().getConfiguredStorageDirectory(), new KeyManager(context).read());
+        CryptoManager manager = null;
+        try {
+            manager = new CryptoManager(context, ShApplication.getInstance().getConfiguredStorageDirectory(), new KeyManager(context).read());
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+        } catch (CertificateException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (UnrecoverableEntryException e) {
+            e.printStackTrace();
+        }
         for (String file : files) {
             PhotoItem photo = null;
             photo = tryToGetAdecryptedPhoto(manager, file);

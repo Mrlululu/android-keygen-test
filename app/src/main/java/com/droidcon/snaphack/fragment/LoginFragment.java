@@ -13,6 +13,10 @@ import com.droidcon.snaphack.MainActivity;
 import com.droidcon.snaphack.R;
 import com.droidcon.snaphack.manager.KeyManager;
 
+import java.security.InvalidAlgorithmParameterException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
@@ -41,7 +45,18 @@ public class LoginFragment extends Fragment {
         final String usernameString = username.getText().toString();
         if(usernameString.equals("student") && password.getText().toString().equals("student")){
             enter.setEnabled(true);
-            new KeyManager(getActivity()).save("super secret key for " + usernameString);
+            try {
+                new KeyManager(getActivity()).save(usernameString+"Key");
+            } catch (NoSuchProviderException e) {
+                Snackbar.make(getView(), e.getMessage(), Snackbar.LENGTH_LONG);
+                e.printStackTrace();
+            } catch (NoSuchAlgorithmException e) {
+                Snackbar.make(getView(), e.getMessage(), Snackbar.LENGTH_LONG);
+                e.printStackTrace();
+            } catch (InvalidAlgorithmParameterException e) {
+                Snackbar.make(getView(), e.getMessage(), Snackbar.LENGTH_LONG);
+                e.printStackTrace();
+            }
             mainActivity.loggedIn();
         }else{
             enter.setEnabled(true);
