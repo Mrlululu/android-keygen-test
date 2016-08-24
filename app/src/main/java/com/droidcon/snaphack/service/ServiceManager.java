@@ -7,6 +7,7 @@ import android.util.Log;
 import com.droidcon.snaphack.manager.KeyManager;
 
 import java.security.InvalidAlgorithmParameterException;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 
@@ -35,12 +36,13 @@ public class ServiceManager {
                 try{
                     new KeyManager(context).save(loginResponse.getKey());
                     callback.success(loginResponse, response);
-
                 } catch (NoSuchProviderException e) {
                     e.printStackTrace();
                 } catch (NoSuchAlgorithmException e) {
                     e.printStackTrace();
                 } catch (InvalidAlgorithmParameterException e) {
+                    e.printStackTrace();
+                } catch (KeyStoreException e) {
                     e.printStackTrace();
                 }
             }

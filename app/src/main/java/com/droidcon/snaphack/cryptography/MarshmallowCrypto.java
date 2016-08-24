@@ -45,8 +45,11 @@ public class MarshmallowCrypto extends Crypto {
 
             String ret = String.format("%s%s%s", CryptoUtils.toBase64(iv), DELIMITER, CryptoUtils.toBase64(cipherText));
             return ret.getBytes();
-        }  catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
-            throw new RuntimeException("There was an error encrypting Shelf storage: " + e.getMessage(), e);
+        }catch (InvalidKeyException e){
+            Log.e("Tomek", "key was probably wiped off");
+            throw new IllegalArgumentException(e.getMessage(),e);
+        }catch (NoSuchAlgorithmException | NoSuchPaddingException | BadPaddingException | IllegalBlockSizeException e) {
+            throw new IllegalArgumentException(e.getMessage(),e);
         }
     }
 
@@ -71,8 +74,12 @@ public class MarshmallowCrypto extends Crypto {
             byte[] clearText = cipher.doFinal(cipherBytes);
 
             return CryptoUtils.fromBase64(new String(clearText));
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException | InvalidAlgorithmParameterException e) {
-            throw new RuntimeException("There was an error decrypting Shelf storage: " + e.getMessage(), e);
+        }catch (InvalidKeyException e){
+            Log.e("Tomek", "key was probably wiped off");
+            return null;
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException  | BadPaddingException | IllegalBlockSizeException | InvalidAlgorithmParameterException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 }

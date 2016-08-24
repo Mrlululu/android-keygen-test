@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.droidcon.snaphack.MainActivity;
 import com.droidcon.snaphack.R;
 import com.droidcon.snaphack.manager.FileManager;
+import com.droidcon.snaphack.manager.KeyManager;
 import com.droidcon.snaphack.model.PhotoItem;
 
 import java.util.List;
@@ -28,10 +29,14 @@ public class PhotoListFragment extends Fragment {
     private PhotoAdapter adapter;
 
     private void refresh() {
-        List<PhotoItem> items = new FileManager(getActivity()).getAll();
+        FileManager fileManager = new FileManager(getActivity());
+        List<PhotoItem> items = fileManager.getAll();
         boolean containsItems = (items.size() > 0);
         emptyText.setVisibility(!containsItems ? View.VISIBLE : View.GONE);
         adapter.setItems(items);
+        String storeType = fileManager.isKeyStoreHardwareBacked() ? "HW-backed"
+                : "SW only";
+        storeTypeText.setText(storeType);
     }
 
     @InjectView(R.id.grid)
@@ -39,6 +44,11 @@ public class PhotoListFragment extends Fragment {
 
     @InjectView(R.id.emptyText)
     public TextView emptyText;
+
+    @InjectView(R.id.store_type)
+    public TextView storeTypeText;
+
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -49,6 +59,7 @@ public class PhotoListFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_main, menu);
+
     }
 
     @Override

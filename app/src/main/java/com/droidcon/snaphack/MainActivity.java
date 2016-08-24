@@ -13,8 +13,7 @@ import com.droidcon.snaphack.fragment.LoginFragment;
 import com.droidcon.snaphack.fragment.PhotoListFragment;
 import com.droidcon.snaphack.manager.CryptoManager;
 import com.droidcon.snaphack.manager.KeyManager;
-import com.facebook.crypto.exception.CryptoInitializationException;
-import com.facebook.crypto.exception.KeyChainException;
+
 
 import java.io.IOException;
 import java.security.KeyStoreException;

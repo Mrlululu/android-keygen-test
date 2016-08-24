@@ -10,4 +10,5 @@
         android:icon="@android:drawable/ic_menu_rotate"
         android:title="Refresh"
         app:showAsAction="always" />
+
 </menu>

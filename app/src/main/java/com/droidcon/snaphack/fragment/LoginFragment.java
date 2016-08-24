@@ -14,6 +14,7 @@ import com.droidcon.snaphack.R;
 import com.droidcon.snaphack.manager.KeyManager;
 
 import java.security.InvalidAlgorithmParameterException;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 
@@ -44,6 +45,7 @@ public class LoginFragment extends Fragment {
         enter.setEnabled(false);
         final String usernameString = username.getText().toString();
 //        if(usernameString.equals("student") && password.getText().toString().equals("student")){
+
             enter.setEnabled(true);
             try {
                 new KeyManager(getActivity()).save(usernameString+"Key");
@@ -56,8 +58,10 @@ public class LoginFragment extends Fragment {
             } catch (InvalidAlgorithmParameterException e) {
                 Snackbar.make(getView(), e.getMessage(), Snackbar.LENGTH_LONG);
                 e.printStackTrace();
+            } catch (KeyStoreException e) {
+                e.printStackTrace();
             }
-            mainActivity.loggedIn();
+        mainActivity.loggedIn();
 //        }else{
 //            enter.setEnabled(true);
 //            Snackbar.make(getView(), "Login Failed. ", Snackbar.LENGTH_LONG);

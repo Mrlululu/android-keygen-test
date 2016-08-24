@@ -87,7 +87,10 @@ public class CryptoManager {
         byte[] decryptedBitmapByteArray;
         try {
             decryptedBitmapByteArray = crypto.decrypt(encryptedBitmapByteArray);
-        }catch (IllegalArgumentException e){
+            if (decryptedBitmapByteArray == null){
+                return null;
+            }
+        }catch (Exception e){
             Log.d("Tomek",e.getMessage());
             return null;
         }
