@@ -36,9 +36,9 @@ public class KeyManager {
                 .setKeySize(256)
                 .setBlockModes("CBC")
                 .setEncryptionPaddings("PKCS7Padding")
-                .setRandomizedEncryptionRequired(true)
-                .setUserAuthenticationRequired(true)
-                .setUserAuthenticationValidityDurationSeconds(5 * 60)
+//                .setRandomizedEncryptionRequired(true)
+//                .setUserAuthenticationRequired(true)
+//                .setUserAuthenticationValidityDurationSeconds(5 * 60)
                 .build();
 
         KeyGenerator kg = KeyGenerator.getInstance("AES", "AndroidKeyStore");
@@ -47,7 +47,7 @@ public class KeyManager {
 
     }
 
-    public String read() throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException, UnrecoverableEntryException {
+    public SecretKey read() throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException, UnrecoverableEntryException {
         String keyName = prefs.getString(KEY_PREFS, "");
         // key retrieval
         KeyStore ks = KeyStore.getInstance("AndroidKeyStore");
@@ -56,8 +56,9 @@ public class KeyManager {
         KeyStore.SecretKeyEntry entry = (KeyStore.SecretKeyEntry)ks.getEntry(keyName, null);
         SecretKey key = entry.getSecretKey();
 
-        byte[] keyBlob = key.getEncoded();
-        return new String(keyBlob, StandardCharsets.UTF_8);
+        return key;
+//        byte[] keyBlob = key.getEncoded();
+//        return new String(keyBlob, StandardCharsets.UTF_8);
     }
 
 }

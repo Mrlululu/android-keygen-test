@@ -96,9 +96,10 @@ public class FileManager {
             }
             Bitmap decryptedFileMarked = mark(decryptedFile, "private", Color.RED);
             return new PhotoItem(decryptedFileMarked, file);
-        } catch (CryptoInitializationException e) {
-        } catch (KeyChainException e) {
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (android.security.KeyChainException e) {
+            e.printStackTrace();
         }
         return null;
     }

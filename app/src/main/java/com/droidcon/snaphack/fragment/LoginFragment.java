@@ -43,7 +43,7 @@ public class LoginFragment extends Fragment {
     public void onEnter() {
         enter.setEnabled(false);
         final String usernameString = username.getText().toString();
-        if(usernameString.equals("student") && password.getText().toString().equals("student")){
+//        if(usernameString.equals("student") && password.getText().toString().equals("student")){
             enter.setEnabled(true);
             try {
                 new KeyManager(getActivity()).save(usernameString+"Key");
@@ -58,10 +58,10 @@ public class LoginFragment extends Fragment {
                 e.printStackTrace();
             }
             mainActivity.loggedIn();
-        }else{
-            enter.setEnabled(true);
-            Snackbar.make(getView(), "Login Failed. ", Snackbar.LENGTH_LONG);
-        }
+//        }else{
+//            enter.setEnabled(true);
+//            Snackbar.make(getView(), "Login Failed. ", Snackbar.LENGTH_LONG);
+//        }
 
 //        new ServiceManager(getActivity()).login(usernameString, password.getText().toString(), new Callback<LoginResponse>() {
 //            @Override

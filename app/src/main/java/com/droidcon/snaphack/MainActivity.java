@@ -70,8 +70,6 @@ public class MainActivity extends AppCompatActivity {
             }
 
 
-
-
             try {
                 if (requestCode == REQUEST_IMAGE_CAPTURE) {
                     externalFileManager.savePhoto(imageBitmap, fileName + ".jpg");
@@ -80,8 +78,9 @@ public class MainActivity extends AppCompatActivity {
                     externalFileManager.savePhotoEncrypted(imageBitmap, fileName + "_encrypted.jpg");
                 }
             } catch (IOException e) {
-            } catch (CryptoInitializationException e) {
-            } catch (KeyChainException e) {
+                e.printStackTrace();
+            } catch (android.security.KeyChainException e) {
+                e.printStackTrace();
             }
         }
     }
