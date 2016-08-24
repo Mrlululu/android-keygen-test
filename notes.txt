@@ -1,0 +1,4 @@
+Notes to Android M TEE
+
+When there is no hardware backed the software KEK is generated
+The current software implementation deliberately uses a 128-bit AES zero key, and employs a constant, all-zero nonce for all keys.
