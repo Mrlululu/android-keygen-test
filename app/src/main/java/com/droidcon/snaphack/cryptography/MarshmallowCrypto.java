@@ -10,6 +10,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
+import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
@@ -29,7 +30,7 @@ public class MarshmallowCrypto extends Crypto {
     private byte[] iv;
     private static String DELIMITER = "]";
 
-    public MarshmallowCrypto(SecretKey secretKey, String transformation) {
+    public MarshmallowCrypto(Key secretKey, String transformation) {
         super(secretKey);
         this.transformation = transformation;
     }

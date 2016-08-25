@@ -19,4 +19,12 @@ public class CryptoUtils {
         return Base64.decode(base64, Base64.NO_WRAP);
     }
 
+    public static String toHex(byte[] bytes) {
+        StringBuffer buff = new StringBuffer();
+        for (byte b : bytes) {
+            buff.append(String.format("%02X", b));
+        }
+
+        return buff.toString();
+    }
 }

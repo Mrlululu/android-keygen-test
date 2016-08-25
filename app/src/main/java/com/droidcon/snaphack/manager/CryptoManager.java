@@ -15,6 +15,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.Key;
 
 import javax.crypto.SecretKey;
 
@@ -26,7 +27,7 @@ public class CryptoManager {
     private String transformation = AES_CBC_NOPADDING;
 
 
-    public CryptoManager(Context context, String path, SecretKey key) {
+    public CryptoManager(Context context, String path, Key key) {
         this.path = path;
         this.crypto = Crypto.getInstance(key,transformation);
         checkPathExists();

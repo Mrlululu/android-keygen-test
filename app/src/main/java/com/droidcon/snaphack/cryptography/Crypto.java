@@ -2,6 +2,8 @@ package com.droidcon.snaphack.cryptography;
 
 import android.os.Build;
 
+import java.security.Key;
+
 import javax.crypto.SecretKey;
 
 /**
@@ -9,16 +11,23 @@ import javax.crypto.SecretKey;
  */
 public abstract class Crypto {
 
-    protected SecretKey secretKey;
+    private static final boolean IS_M = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
+    private static final boolean IS_KK = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
 
-    protected Crypto(SecretKey secretKey) {
+    protected Key secretKey;
+
+    protected Crypto(Key secretKey) {
         this.secretKey = secretKey;
     }
 
-    public static Crypto getInstance(SecretKey secretKey, String transformation) {
-        //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+    public static Crypto getInstance(Key secretKey, String transformation) {
+        if (IS_M) {
             return new MarshmallowCrypto(secretKey, transformation);
-        //}
+        }else if(IS_KK){
+            return new KitKatCrypto(secretKey, transformation);
+        }else{
+            return new KitKatCrypto(secretKey,transformation);
+        }
     }
 
     public abstract byte[] encrypt(byte[] clearText);
