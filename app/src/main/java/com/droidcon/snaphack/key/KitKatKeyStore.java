@@ -44,7 +44,8 @@ public class KitKatKeyStore implements MyKeyStore {
     private final SharedPreferences prefs;
     private static final String PREFS = "prefs";
 
-    public static final String RSA_KEY_NAME = "rsa_key";
+    public static final String RSA_KEY_PREFIX = "rsa_key_";
+    public static final String AES_KEY_PREFIX = "aes_key_";
 
     boolean isSigner = false;
     Context context;
@@ -60,6 +61,9 @@ public class KitKatKeyStore implements MyKeyStore {
     @Override
     public void saveKey(String keyAlias) throws NoSuchProviderException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, KeyStoreException {
 
+        String rsaKeyAlias = RSA_KEY_PREFIX + keyAlias;
+        String aesKeyAlias = AES_KEY_PREFIX + keyAlias;
+
         // Check if key exist
         KeyStore ks = null;
         try {
@@ -71,17 +75,17 @@ public class KitKatKeyStore implements MyKeyStore {
             e.printStackTrace();
         }
 
-        if(!ks.containsAlias(keyAlias)){
-            Log.d("Tomek", "Key with name: " + keyAlias + " does not exist");
+        if(!ks.containsAlias(rsaKeyAlias)) {
+            Log.d("Tomek", "Key with name: " + rsaKeyAlias + " does not exist");
 
             // Generate rsa key pair in SE
             Calendar notBefore = Calendar.getInstance();
             Calendar notAfter = Calendar.getInstance();
             notAfter.add(1, Calendar.YEAR);
             KeyPairGeneratorSpec spec = new KeyPairGeneratorSpec.Builder(context)
-                    .setAlias(keyAlias)
+                    .setAlias(rsaKeyAlias)
                     .setSubject(
-                            new X500Principal(String.format("CN=%s, OU=%s", keyAlias,
+                            new X500Principal(String.format("CN=%s, OU=%s", rsaKeyAlias,
                                     context.getPackageName())))
                     .setSerialNumber(BigInteger.ONE)
                     .setStartDate(notBefore.getTime())
@@ -90,9 +94,6 @@ public class KitKatKeyStore implements MyKeyStore {
                     "AndroidKeyStore");
             kpGenerator.initialize(spec);
             KeyPair kp = kpGenerator.generateKeyPair();
-
-
-            // check if encrypted symetric key exists
 
             // generate symetric key that will be encoded with TEE rsa key
             SecretKey symKey = generateAesKey();
@@ -107,9 +108,10 @@ public class KitKatKeyStore implements MyKeyStore {
             }
 
             // place encrypted symetric key in store
-            prefs.edit().putString(SYM_KEY_PREFS, encryptedKeyString).apply();
+            prefs.edit().putString(aesKeyAlias, encryptedKeyString).apply();
 
         }
+
 
     }
 
@@ -117,12 +119,13 @@ public class KitKatKeyStore implements MyKeyStore {
     @Override
     public Key readKey(String keyAlias) throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException, UnrecoverableEntryException {
 
+        String rsaKeyAlias = RSA_KEY_PREFIX + keyAlias;
         Key outputKey = null;
 
         KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
         keyStore.load(null);
         java.security.KeyStore.Entry keyEntry = keyStore.getEntry(
-                keyAlias, null);
+                rsaKeyAlias, null);
         RSAPublicKey publicKey = (RSAPublicKey) ((java.security.KeyStore.PrivateKeyEntry) keyEntry)
                 .getCertificate().getPublicKey();
         RSAPrivateKey privateKey = (RSAPrivateKey) ((java.security.KeyStore.PrivateKeyEntry) keyEntry)

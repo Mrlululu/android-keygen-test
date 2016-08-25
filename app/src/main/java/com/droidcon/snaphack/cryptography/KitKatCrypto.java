@@ -36,6 +36,8 @@ public class KitKatCrypto extends Crypto {
     private Context context;
     private final SharedPreferences prefs;
     private static final String PREFS = "prefs";
+    private String rsaKeyAlias;
+    private String aesKeyAlias;
 
     public KitKatCrypto(Context ctx,Key secretKey,boolean isSigner,String keyAlias) {
         super(secretKey);
@@ -43,13 +45,17 @@ public class KitKatCrypto extends Crypto {
         this.isSigner = isSigner;
         this.keyAlias = keyAlias;
         this.prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+
+        this.rsaKeyAlias = KitKatKeyStore.RSA_KEY_PREFIX + keyAlias;
+        this.aesKeyAlias = KitKatKeyStore.AES_KEY_PREFIX + keyAlias;
     }
 
 
     @Override
     public byte[] encrypt(byte[] clearText) {
         // First get encrypted symmetric key from store
-        String symKeyString = prefs.getString(KitKatKeyStore.SYM_KEY_PREFS, "");
+        String symKeyString = prefs.getString(aesKeyAlias, "");
+
         byte[] encryptedSymKeyBlob = null;
         try {
             encryptedSymKeyBlob = symKeyString.getBytes("UTF-8");
@@ -74,7 +80,7 @@ public class KitKatCrypto extends Crypto {
     public byte[] decrypt(byte[] cipherText) throws InvalidCipherTextException {
 
         // First get encrypted symmetric key from store
-        String symKeyString = prefs.getString(KitKatKeyStore.SYM_KEY_PREFS, "");
+        String symKeyString = prefs.getString(aesKeyAlias, "");
         byte[] encryptedSymKeyBlob = null;
         try {
             encryptedSymKeyBlob = symKeyString.getBytes("UTF-8");
@@ -96,7 +102,7 @@ public class KitKatCrypto extends Crypto {
 
     public byte[] encryptWithRsa(byte[] plainBytes) {
         try {
-            AndroidRsaEngine rsa = new AndroidRsaEngine(keyAlias, false);
+            AndroidRsaEngine rsa = new AndroidRsaEngine(rsaKeyAlias, false);
 
             Digest digest = new SHA512Digest();
             Digest mgf1digest = new SHA512Digest();
@@ -112,7 +118,7 @@ public class KitKatCrypto extends Crypto {
 
     public byte[] decryptWithRsa(byte[] ciphertextRawBytes) throws InvalidCipherTextException {
         try {
-            AndroidRsaEngine rsa = new AndroidRsaEngine(keyAlias, false);
+            AndroidRsaEngine rsa = new AndroidRsaEngine(rsaKeyAlias, false);
             Digest digest = new SHA512Digest();
             Digest mgf1digest = new SHA512Digest();
             OAEPEncoding oaep = new OAEPEncoding(rsa, digest, mgf1digest, null);
