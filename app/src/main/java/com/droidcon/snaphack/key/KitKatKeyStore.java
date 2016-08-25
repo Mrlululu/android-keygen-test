@@ -1,9 +1,13 @@
 package com.droidcon.snaphack.key;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
+import android.security.KeyChain;
 import android.security.KeyPairGeneratorSpec;
+import android.security.keystore.KeyProperties;
 import android.util.Log;
 
 import com.droidcon.snaphack.cryptography.Crypto;
@@ -86,11 +90,10 @@ public class KitKatKeyStore implements MyKeyStore {
                     "AndroidKeyStore");
             kpGenerator.initialize(spec);
             KeyPair kp = kpGenerator.generateKeyPair();
-        }
-        
-        String symKeyString = prefs.getString(KitKatKeyStore.SYM_KEY_PREFS, "");
-        // check if encrypted symetric key exists
-        if(symKeyString.length()!=0){
+
+
+            // check if encrypted symetric key exists
+
             // generate symetric key that will be encoded with TEE rsa key
             SecretKey symKey = generateAesKey();
 
@@ -105,9 +108,12 @@ public class KitKatKeyStore implements MyKeyStore {
 
             // place encrypted symetric key in store
             prefs.edit().putString(SYM_KEY_PREFS, encryptedKeyString).apply();
+
         }
+
     }
 
+    @TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
     public Key readKey(String keyAlias) throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException, UnrecoverableEntryException {
 
@@ -132,9 +138,10 @@ public class KitKatKeyStore implements MyKeyStore {
         return outputKey;
     }
 
+    @TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
     public boolean isHardwareBacked() throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException {
-        return false;
+        return KeyChain.isBoundKeyAlgorithm(KeyProperties.KEY_ALGORITHM_RSA);
     }
 
 

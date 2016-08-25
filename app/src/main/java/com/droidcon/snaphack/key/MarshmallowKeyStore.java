@@ -81,7 +81,7 @@ public class MarshmallowKeyStore implements MyKeyStore {
 
 
     }
-
+    @TargetApi(Build.VERSION_CODES.M)
     @Override
     public SecretKey readKey(String keyAlias) throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException, UnrecoverableEntryException {
 
@@ -95,6 +95,7 @@ public class MarshmallowKeyStore implements MyKeyStore {
         return key;
     }
 
+    @TargetApi(Build.VERSION_CODES.M)
     @Override
     public boolean isHardwareBacked() throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException {
 
