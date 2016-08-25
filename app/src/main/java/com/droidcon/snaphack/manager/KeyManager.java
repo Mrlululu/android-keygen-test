@@ -39,15 +39,15 @@ public class KeyManager {
     private static final String PREFS = "prefs";
     MyKeyStore myKeyStore = null;
 
-    public KeyManager(Context context) {
+    public KeyManager(Context context, boolean isSigner) {
         this.prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
 
         if(IS_M){
             myKeyStore = new MarshmallowKeyStore();
         }else if(IS_KK){
-            myKeyStore = new KitKatKeyStore();
+            myKeyStore = new KitKatKeyStore(context,isSigner);
         } else {
-            myKeyStore = new KitKatKeyStore();
+            myKeyStore = new KitKatKeyStore(context,isSigner);
         }
 
     }
@@ -66,6 +66,12 @@ public class KeyManager {
 
     public boolean isHardwareBacked() throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException, UnrecoverableEntryException, NoSuchProviderException, InvalidKeySpecException {
         return myKeyStore.isHardwareBacked();
+    }
+
+
+    public String getKeyAlias(){
+        String keyName = prefs.getString(KEY_PREFS, "");
+        return keyName;
     }
 
 }

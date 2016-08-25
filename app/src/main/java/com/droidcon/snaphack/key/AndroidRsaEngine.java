@@ -38,6 +38,7 @@ public class AndroidRsaEngine implements AsymmetricBlockCipher {
     private boolean isSigner;
 
     private Cipher cipher;
+    private final String keyAlias;
     private KeyStore keyStore;
     private RSAPrivateKey privateKey;
     private RSAPublicKey publicKey;
@@ -45,35 +46,32 @@ public class AndroidRsaEngine implements AsymmetricBlockCipher {
     private boolean forEncryption;
     private CipherParameters params;
 
-    public AndroidRsaEngine(Key key, boolean isSigner) {
-        this.key = key;
+    public AndroidRsaEngine(String keyAlias, boolean isSigner) {
+        this.keyAlias = keyAlias;
         this.isSigner = isSigner;
         try {
             this.cipher = Cipher.getInstance("RSA/ECB/NoPadding");
-            // TODO: move to mykeystore implementation
-
-//            this.keyStore = KeyStore.getInstance("AndroidKeyStore");
-//            keyStore.load(null);
-//            java.security.KeyStore.Entry keyEntry = keyStore.getEntry(
-//                    this.keyAlias, null);
-//            publicKey = (RSAPublicKey) ((java.security.KeyStore.PrivateKeyEntry) keyEntry)
-//                    .getCertificate().getPublicKey();
-//            privateKey = (RSAPrivateKey) ((java.security.KeyStore.PrivateKeyEntry) keyEntry)
-//                    .getPrivateKey();
+            this.keyStore = KeyStore.getInstance("AndroidKeyStore");
+            keyStore.load(null);
+            java.security.KeyStore.Entry keyEntry = keyStore.getEntry(
+                    this.keyAlias, null);
+            publicKey = (RSAPublicKey) ((java.security.KeyStore.PrivateKeyEntry) keyEntry)
+                    .getCertificate().getPublicKey();
+            privateKey = (RSAPrivateKey) ((java.security.KeyStore.PrivateKeyEntry) keyEntry)
+                    .getPrivateKey();
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         } catch (NoSuchPaddingException e) {
             throw new RuntimeException(e);
+        } catch (KeyStoreException e) {
+            throw new RuntimeException(e);
+        } catch (CertificateException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (UnrecoverableEntryException e) {
+            throw new RuntimeException(e);
         }
-//        } catch (KeyStoreException e) {
-//            throw new RuntimeException(e);
-//        } catch (CertificateException e) {
-//            throw new RuntimeException(e);
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        } catch (UnrecoverableEntryException e) {
-//            throw new RuntimeException(e);
-//        }
     }
 
     @Override

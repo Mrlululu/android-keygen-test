@@ -23,13 +23,11 @@ public class CryptoManager {
     private final String path;
     private final Crypto crypto;
 
-    static public final String AES_CBC_NOPADDING = "AES/CBC/PKCS7Padding";
-    private String transformation = AES_CBC_NOPADDING;
 
 
-    public CryptoManager(Context context, String path, Key key) {
+    public CryptoManager(Context context, String path, Key key,boolean isSigner, String keyAlias) {
         this.path = path;
-        this.crypto = Crypto.getInstance(key,transformation);
+        this.crypto = Crypto.getInstance(context,key,isSigner,keyAlias);
         checkPathExists();
     }
 

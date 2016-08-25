@@ -29,29 +29,29 @@ public class ServiceManager {
         restService = restAdapter.create(LoginService.class);
     }
 
-    public void login(String username, String password, final Callback<LoginResponse> callback) {
-        restService.login(new LoginRequest(username, password), new Callback<LoginResponse>() {
-            @Override
-            public void success(LoginResponse loginResponse, Response response) {
-                try{
-                    new KeyManager(context).save(loginResponse.getKey());
-                    callback.success(loginResponse, response);
-                } catch (NoSuchProviderException e) {
-                    e.printStackTrace();
-                } catch (NoSuchAlgorithmException e) {
-                    e.printStackTrace();
-                } catch (InvalidAlgorithmParameterException e) {
-                    e.printStackTrace();
-                } catch (KeyStoreException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void failure(RetrofitError error) {
-                Log.e(TAG, error.getLocalizedMessage());
-                callback.failure(error);
-            }
-        });
-    }
+//    public void login(String username, String password, final Callback<LoginResponse> callback) {
+//        restService.login(new LoginRequest(username, password), new Callback<LoginResponse>() {
+//            @Override
+//            public void success(LoginResponse loginResponse, Response response) {
+//                try{
+//                    new KeyManager(context,false).save(loginResponse.getKey());
+//                    callback.success(loginResponse, response);
+//                } catch (NoSuchProviderException e) {
+//                    e.printStackTrace();
+//                } catch (NoSuchAlgorithmException e) {
+//                    e.printStackTrace();
+//                } catch (InvalidAlgorithmParameterException e) {
+//                    e.printStackTrace();
+//                } catch (KeyStoreException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//
+//            @Override
+//            public void failure(RetrofitError error) {
+//                Log.e(TAG, error.getLocalizedMessage());
+//                callback.failure(error);
+//            }
+//        });
+//    }
 }

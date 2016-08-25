@@ -1,6 +1,9 @@
 package com.droidcon.snaphack.cryptography;
 
+import android.content.Context;
 import android.os.Build;
+
+import org.spongycastle.crypto.InvalidCipherTextException;
 
 import java.security.Key;
 
@@ -20,19 +23,19 @@ public abstract class Crypto {
         this.secretKey = secretKey;
     }
 
-    public static Crypto getInstance(Key secretKey, String transformation) {
+    public static Crypto getInstance(Context ctx,Key secretKey,boolean isSigner,String keyAlias) {
         if (IS_M) {
-            return new MarshmallowCrypto(secretKey, transformation);
+            return new MarshmallowCrypto(secretKey);
         }else if(IS_KK){
-            return new KitKatCrypto(secretKey, transformation);
+            return new KitKatCrypto(ctx,secretKey,isSigner,keyAlias);
         }else{
-            return new KitKatCrypto(secretKey,transformation);
+            return new KitKatCrypto(ctx,secretKey,isSigner,keyAlias);
         }
     }
 
     public abstract byte[] encrypt(byte[] clearText);
 
-    public abstract byte[] decrypt(final byte[] cipherText);
+    public abstract byte[] decrypt(final byte[] cipherText) throws InvalidCipherTextException;
 
 
 }

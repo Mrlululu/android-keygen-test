@@ -48,7 +48,7 @@ public class LoginFragment extends Fragment {
 
             enter.setEnabled(true);
             try {
-                new KeyManager(getActivity()).save(usernameString+"Key");
+                new KeyManager(getActivity(),true).save(usernameString+"Key");
             } catch (NoSuchProviderException e) {
                 Snackbar.make(getView(), e.getMessage(), Snackbar.LENGTH_LONG);
                 e.printStackTrace();

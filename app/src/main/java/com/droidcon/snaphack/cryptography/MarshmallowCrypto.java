@@ -25,21 +25,20 @@ import javax.crypto.spec.IvParameterSpec;
  * Created by tomasz on 24.08.2016.
  */
 public class MarshmallowCrypto extends Crypto {
-    private final String  transformation;
+    static public final String AES_CBC_NOPADDING = "AES/CBC/PKCS7Padding";
 
     private byte[] iv;
     private static String DELIMITER = "]";
 
-    public MarshmallowCrypto(Key secretKey, String transformation) {
+    public MarshmallowCrypto(Key secretKey) {
         super(secretKey);
-        this.transformation = transformation;
     }
 
     @TargetApi(Build.VERSION_CODES.M)
     @Override
     public byte[] encrypt(byte[] clearText) {
         try {
-            Cipher cipher = Cipher.getInstance(transformation);
+            Cipher cipher = Cipher.getInstance(AES_CBC_NOPADDING);
             cipher.init(Cipher.ENCRYPT_MODE, secretKey);
             byte[] cipherText = cipher.doFinal(CryptoUtils.toBase64(clearText).getBytes());
             this.iv = cipher.getIV();
@@ -68,7 +67,7 @@ public class MarshmallowCrypto extends Crypto {
             byte[] iv = CryptoUtils.fromBase64(fields[0]);
             byte[] cipherBytes = CryptoUtils.fromBase64(fields[1]);
 
-            Cipher cipher = Cipher.getInstance(transformation);
+            Cipher cipher = Cipher.getInstance(AES_CBC_NOPADDING);
             IvParameterSpec ivParams = new IvParameterSpec(iv);
             cipher.init(Cipher.DECRYPT_MODE, secretKey, ivParams);
 
