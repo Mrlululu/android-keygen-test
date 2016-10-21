@@ -6,13 +6,12 @@ package com.droidcon.snaphack.key;
 
 import java.io.IOException;
 import java.security.InvalidKeyException;
-import java.security.Key;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateException;
-import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 
 import javax.crypto.BadPaddingException;
@@ -20,45 +19,47 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
+import android.util.Log;
+
+import com.droidcon.snaphack.cryptography.CryptoUtils;
+import com.droidcon.snaphack.manager.KeyManager;
+
 import org.spongycastle.crypto.AsymmetricBlockCipher;
 import org.spongycastle.crypto.CipherParameters;
 import org.spongycastle.crypto.InvalidCipherTextException;
 
-import android.util.Log;
-
-import com.droidcon.snaphack.cryptography.CryptoUtils;
 
 public class AndroidRsaEngine implements AsymmetricBlockCipher {
 
     private static final String TAG = AndroidRsaEngine.class.getSimpleName();
     private static final boolean DEBUG = false;
 
-
-    private Key key;
-    private boolean isSigner;
-
     private Cipher cipher;
     private final String keyAlias;
     private KeyStore keyStore;
-    private RSAPrivateKey privateKey;
+    private PrivateKey privateKey;
     private RSAPublicKey publicKey;
 
     private boolean forEncryption;
     private CipherParameters params;
 
-    public AndroidRsaEngine(String keyAlias, boolean isSigner) {
+    public AndroidRsaEngine(String keyAlias) {
         this.keyAlias = keyAlias;
-        this.isSigner = isSigner;
         try {
-            this.cipher = Cipher.getInstance("RSA/ECB/NoPadding");
+
+            if(KeyManager.IS_M){
+                this.cipher = Cipher.getInstance("RSA/NONE/OAEPWithSHA-1AndMGF1Padding");
+            }else {
+                this.cipher = Cipher.getInstance("RSA/NONE/NoPadding");
+            }
+
             this.keyStore = KeyStore.getInstance("AndroidKeyStore");
             keyStore.load(null);
             java.security.KeyStore.Entry keyEntry = keyStore.getEntry(
                     this.keyAlias, null);
             publicKey = (RSAPublicKey) ((java.security.KeyStore.PrivateKeyEntry) keyEntry)
                     .getCertificate().getPublicKey();
-            privateKey = (RSAPrivateKey) ((java.security.KeyStore.PrivateKeyEntry) keyEntry)
-                    .getPrivateKey();
+            privateKey =  ((java.security.KeyStore.PrivateKeyEntry) keyEntry).getPrivateKey();
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         } catch (NoSuchPaddingException e) {
@@ -109,16 +110,29 @@ public class AndroidRsaEngine implements AsymmetricBlockCipher {
 
         try {
             if (forEncryption) {
-                cipher.init(Cipher.ENCRYPT_MODE, isSigner ? privateKey
-                        : publicKey);
+                cipher.init(Cipher.ENCRYPT_MODE,publicKey);
             } else {
-                cipher.init(Cipher.DECRYPT_MODE, isSigner ? publicKey
-                        : privateKey);
+                cipher.init(Cipher.DECRYPT_MODE,privateKey);
             }
         } catch (InvalidKeyException e) {
             throw new RuntimeException(e);
         }
     }
+
+
+    public byte[] encrypt_decrypt(byte[] in, int inOff, int inLen) throws InvalidCipherTextException {
+        try {
+            byte[] result = cipher.doFinal(in, inOff, inLen);
+            return  result;
+        } catch (IllegalBlockSizeException e) {
+            throw new InvalidCipherTextException("Illegal block size: "
+                    + e.getMessage());
+        } catch (BadPaddingException e) {
+            throw new InvalidCipherTextException("Bad padding: "
+                    + e.getMessage());
+        }
+    };
+
 
     @Override
     public byte[] processBlock(byte[] in, int inOff, int inLen)

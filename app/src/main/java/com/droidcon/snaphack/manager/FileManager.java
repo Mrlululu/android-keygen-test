@@ -51,8 +51,8 @@ public class FileManager {
 
         CryptoManager manager = null;
         try {
-            KeyManager keyManager = new KeyManager(context,false);
-            manager = new CryptoManager(context, ShApplication.getInstance().getConfiguredStorageDirectory(), keyManager.read(),false,keyManager.getKeyAlias());
+            KeyManager keyManager = new KeyManager(context);
+            manager = new CryptoManager(context, ShApplication.getInstance().getConfiguredStorageDirectory(), keyManager.read(),keyManager.getKeyAlias());
         } catch (KeyStoreException e) {
             e.printStackTrace();
         } catch (CertificateException e) {
@@ -79,7 +79,7 @@ public class FileManager {
 
     public boolean isKeyStoreHardwareBacked(){
         try {
-            return new KeyManager(context,false).isHardwareBacked();
+            return new KeyManager(context).isHardwareBacked();
         } catch (KeyStoreException e) {
             e.printStackTrace();
         } catch (CertificateException e) {

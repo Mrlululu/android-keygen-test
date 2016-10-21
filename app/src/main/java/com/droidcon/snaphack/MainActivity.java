@@ -45,8 +45,8 @@ public class MainActivity extends AppCompatActivity {
 
             CryptoManager externalFileManager = null;
             try {
-                KeyManager keyManager = new KeyManager(this,false);
-                externalFileManager = new CryptoManager(this, ShApplication.getInstance().getConfiguredStorageDirectory(), keyManager.read(),false,keyManager.getKeyAlias());
+                KeyManager keyManager = new KeyManager(this);
+                externalFileManager = new CryptoManager(this, ShApplication.getInstance().getConfiguredStorageDirectory(), keyManager.read(),keyManager.getKeyAlias());
             } catch (KeyStoreException e) {
                 Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
                 Log.e("Tomek", e.getMessage());

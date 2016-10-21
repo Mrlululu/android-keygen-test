@@ -3,22 +3,11 @@ package com.droidcon.snaphack.manager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
-import android.security.KeyChain;
-import android.security.keystore.KeyGenParameterSpec;
-import android.security.keystore.KeyInfo;
-import android.security.keystore.KeyProperties;
-import android.util.Log;
-
 import com.droidcon.snaphack.key.KitKatKeyStore;
-import com.droidcon.snaphack.key.MarshmallowKeyStore;
 import com.droidcon.snaphack.key.MyKeyStore;
-
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.Key;
-import java.security.KeyFactory;
-import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -31,23 +20,23 @@ import javax.crypto.SecretKey;
 
 public class KeyManager {
 
-    private static final boolean IS_M = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
-    private static final boolean IS_KK = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
+    public static final boolean IS_M = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
+    public static final boolean IS_KK = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
 
     private static final String KEY_PREFS = "sdfsdf";
     private final SharedPreferences prefs;
     private static final String PREFS = "prefs";
     MyKeyStore myKeyStore = null;
 
-    public KeyManager(Context context, boolean isSigner) {
+    public KeyManager(Context context) {
         this.prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
 
         if(IS_M){
-            myKeyStore = new MarshmallowKeyStore();
+            myKeyStore = new KitKatKeyStore(context);// new MarshmallowKeyStore();
         }else if(IS_KK){
-            myKeyStore = new KitKatKeyStore(context,isSigner);
+            myKeyStore = new KitKatKeyStore(context);
         } else {
-            myKeyStore = new KitKatKeyStore(context,isSigner);
+            myKeyStore = new KitKatKeyStore(context);
         }
 
     }

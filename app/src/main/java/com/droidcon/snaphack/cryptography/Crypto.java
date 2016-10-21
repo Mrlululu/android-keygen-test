@@ -3,11 +3,10 @@ package com.droidcon.snaphack.cryptography;
 import android.content.Context;
 import android.os.Build;
 
+
 import org.spongycastle.crypto.InvalidCipherTextException;
 
 import java.security.Key;
-
-import javax.crypto.SecretKey;
 
 /**
  * Created by tomasz on 24.08.2016.
@@ -23,13 +22,13 @@ public abstract class Crypto {
         this.secretKey = secretKey;
     }
 
-    public static Crypto getInstance(Context ctx,Key secretKey,boolean isSigner,String keyAlias) {
+    public static Crypto getInstance(Context ctx,Key secretKey,String keyAlias) {
         if (IS_M) {
-            return new MarshmallowCrypto(secretKey);
+            return new KitKatCrypto(ctx,secretKey,keyAlias);//new MarshmallowCrypto(secretKey);
         }else if(IS_KK){
-            return new KitKatCrypto(ctx,secretKey,isSigner,keyAlias);
+            return new KitKatCrypto(ctx,secretKey,keyAlias);
         }else{
-            return new KitKatCrypto(ctx,secretKey,isSigner,keyAlias);
+            return new KitKatCrypto(ctx,secretKey,keyAlias);
         }
     }
 

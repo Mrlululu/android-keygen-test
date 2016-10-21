@@ -24,9 +24,9 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
 import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateException;
-import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Calendar;
 
@@ -47,12 +47,10 @@ public class KitKatKeyStore implements MyKeyStore {
     public static final String RSA_KEY_PREFIX = "rsa_key_";
     public static final String AES_KEY_PREFIX = "aes_key_";
 
-    boolean isSigner = false;
     Context context;
 
-    public KitKatKeyStore(Context ctx,boolean isSigner) {
+    public KitKatKeyStore(Context ctx) {
         context = ctx;
-        this.isSigner = isSigner;
 
         this.prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
     }
@@ -98,7 +96,7 @@ public class KitKatKeyStore implements MyKeyStore {
             // generate symetric key that will be encoded with TEE rsa key
             SecretKey symKey = generateAesKey();
 
-            KitKatCrypto crypto = (KitKatCrypto)Crypto.getInstance(context,null, false, keyAlias);
+            KitKatCrypto crypto = (KitKatCrypto)Crypto.getInstance(context,null,keyAlias);
             byte[] encryptedKey  = crypto.encryptWithRsa(symKey.getEncoded());
             String encryptedKeyString = null;
             try {
@@ -109,7 +107,6 @@ public class KitKatKeyStore implements MyKeyStore {
 
             // place encrypted symetric key in store
             prefs.edit().putString(aesKeyAlias, encryptedKeyString).apply();
-
         }
 
 
@@ -128,15 +125,11 @@ public class KitKatKeyStore implements MyKeyStore {
                 rsaKeyAlias, null);
         RSAPublicKey publicKey = (RSAPublicKey) ((java.security.KeyStore.PrivateKeyEntry) keyEntry)
                 .getCertificate().getPublicKey();
-        RSAPrivateKey privateKey = (RSAPrivateKey) ((java.security.KeyStore.PrivateKeyEntry) keyEntry)
+        PrivateKey privateKey =  ((KeyStore.PrivateKeyEntry) keyEntry)
                 .getPrivateKey();
 
-        if(isSigner){
-            outputKey = publicKey;
-        }else {
-            outputKey = privateKey;
-        }
 
+        outputKey = privateKey;
 
         return outputKey;
     }
@@ -158,8 +151,6 @@ public class KitKatKeyStore implements MyKeyStore {
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
-
     }
-
 
 }

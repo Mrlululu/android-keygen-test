@@ -25,9 +25,9 @@ public class CryptoManager {
 
 
 
-    public CryptoManager(Context context, String path, Key key,boolean isSigner, String keyAlias) {
+    public CryptoManager(Context context, String path, Key key, String keyAlias) {
         this.path = path;
-        this.crypto = Crypto.getInstance(context,key,isSigner,keyAlias);
+        this.crypto = Crypto.getInstance(context,key,keyAlias);
         checkPathExists();
     }
 

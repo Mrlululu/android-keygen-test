@@ -2,10 +2,11 @@ package com.droidcon.snaphack.cryptography;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import com.droidcon.snaphack.key.AndroidRsaEngine;
 import com.droidcon.snaphack.key.KitKatKeyStore;
+import com.droidcon.snaphack.manager.KeyManager;
+
 
 import org.spongycastle.crypto.Digest;
 import org.spongycastle.crypto.InvalidCipherTextException;
@@ -13,13 +14,9 @@ import org.spongycastle.crypto.digests.SHA512Digest;
 import org.spongycastle.crypto.encodings.OAEPEncoding;
 
 import java.io.UnsupportedEncodingException;
-import java.security.GeneralSecurityException;
 import java.security.Key;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
 
 import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -30,20 +27,16 @@ public class KitKatCrypto extends Crypto {
 
     private static final String INIT_VECT = "RandomInitVector" ;
 
-    private boolean isSigner;
-    private String keyAlias;
-
     private Context context;
     private final SharedPreferences prefs;
     private static final String PREFS = "prefs";
     private String rsaKeyAlias;
     private String aesKeyAlias;
 
-    public KitKatCrypto(Context ctx,Key secretKey,boolean isSigner,String keyAlias) {
+    public KitKatCrypto(Context ctx,Key secretKey,String keyAlias) {
         super(secretKey);
         context = ctx;
-        this.isSigner = isSigner;
-        this.keyAlias = keyAlias;
+
         this.prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
 
         this.rsaKeyAlias = KitKatKeyStore.RSA_KEY_PREFIX + keyAlias;
@@ -77,7 +70,7 @@ public class KitKatCrypto extends Crypto {
     }
 
     @Override
-    public byte[] decrypt(byte[] cipherText) throws InvalidCipherTextException {
+    public byte[] decrypt(byte[] cipherText) {
 
         // First get encrypted symmetric key from store
         String symKeyString = prefs.getString(aesKeyAlias, "");
@@ -102,14 +95,19 @@ public class KitKatCrypto extends Crypto {
 
     public byte[] encryptWithRsa(byte[] plainBytes) {
         try {
-            AndroidRsaEngine rsa = new AndroidRsaEngine(rsaKeyAlias, false);
+            AndroidRsaEngine rsa = new AndroidRsaEngine(rsaKeyAlias);
 
-            Digest digest = new SHA512Digest();
-            Digest mgf1digest = new SHA512Digest();
-            OAEPEncoding oaep = new OAEPEncoding(rsa, digest, mgf1digest, null);
-            oaep.init(true, null);
-            byte[] cipherText = oaep.processBlock(plainBytes, 0, plainBytes.length);
-
+            byte[] cipherText = null;
+            if(KeyManager.IS_M){
+                rsa.init(true,null);
+                cipherText = rsa.encrypt_decrypt(plainBytes, 0, plainBytes.length);
+            }else{
+                Digest digest = new SHA512Digest();
+                Digest mgf1digest = new SHA512Digest();
+                OAEPEncoding oaep = new OAEPEncoding(rsa, digest, mgf1digest, null);
+                oaep.init(true, null);
+                cipherText = oaep.processBlock(plainBytes, 0, plainBytes.length);
+            }
             return CryptoUtils.toBase64(cipherText).getBytes();
         } catch (InvalidCipherTextException e) {
             throw new RuntimeException(e);
@@ -118,16 +116,21 @@ public class KitKatCrypto extends Crypto {
 
     public byte[] decryptWithRsa(byte[] ciphertextRawBytes) throws InvalidCipherTextException {
         try {
-            AndroidRsaEngine rsa = new AndroidRsaEngine(rsaKeyAlias, false);
-            Digest digest = new SHA512Digest();
-            Digest mgf1digest = new SHA512Digest();
-            OAEPEncoding oaep = new OAEPEncoding(rsa, digest, mgf1digest, null);
-            oaep.init(false, null);
+            AndroidRsaEngine rsa = new AndroidRsaEngine(rsaKeyAlias);
 
+            byte[] plainText = null;
             byte[] ciphertextBytes = CryptoUtils.fromBase64(new String(ciphertextRawBytes,"UTF-8"));
-
-            byte[] plain = oaep.processBlock(ciphertextBytes, 0, ciphertextBytes.length);
-            return plain;
+            if(KeyManager.IS_M){
+                rsa.init(false, null);
+                plainText = rsa.encrypt_decrypt(ciphertextBytes, 0, ciphertextBytes.length);
+            }else {
+                Digest digest = new SHA512Digest();
+                Digest mgf1digest = new SHA512Digest();
+                OAEPEncoding oaep = new OAEPEncoding(rsa, digest, mgf1digest, null);
+                oaep.init(false,null);
+                plainText = oaep.processBlock(ciphertextBytes, 0, ciphertextBytes.length);
+            }
+            return plainText;
         }catch (InvalidCipherTextException e){
             throw e;
         } catch (UnsupportedEncodingException e) {
