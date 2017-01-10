@@ -72,6 +72,8 @@ public class PhotoListFragment extends Fragment {
             case R.id.action_refresh:
                 refresh();
                 return true;
+            case R.id.action_logout:
+                mainActivity.logout();
             default:
                 break;
         }

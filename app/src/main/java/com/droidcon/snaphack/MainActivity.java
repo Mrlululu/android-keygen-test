@@ -86,8 +86,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void loggedIn() {
-        getFragmentManager().beginTransaction().add(R.id.content_main, new PhotoListFragment()).addToBackStack(null).commit();
+        //getFragmentManager().beginTransaction().add(R.id.content_main, new PhotoListFragment()).addToBackStack(null).commit();
+        getFragmentManager().beginTransaction().replace(R.id.content_main, new PhotoListFragment()).commit();
     }
+
+    public void logout(){
+       // getFragmentManager().beginTransaction().add(R.id.content_main, new LoginFragment()).addToBackStack(null).commit();
+
+        getFragmentManager().beginTransaction().replace(R.id.content_main, new LoginFragment()).commit();
+    }
+
 
     public void takePhoto() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
